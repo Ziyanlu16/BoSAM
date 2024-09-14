@@ -27,11 +27,12 @@ from torch.utils.data.dataloader import default_collate
 
 # %% set up parser
 parser = argparse.ArgumentParser()
-parser.add_argument('--task_name', type=str, default='ablation_train_no_point')
+parser.add_argument('-tdp', '--test_data_path', nargs='+', default=['/mnt/dataset/trainingdata'])
+parser.add_argument('--task_name', type=str, default=None)
 parser.add_argument('--click_type', type=str, default='random')
 parser.add_argument('--multi_click', action='store_true', default=False)
 parser.add_argument('--model_type', type=str, default='vit_b_ori')
-parser.add_argument('--checkpoint', type=str, default='/mnt/risk2/SAM-Med3D/work_dir/union_train_turbo_best_continue4/sam_model_dice_best.pth')
+parser.add_argument('--checkpoint', type=str, default='path/to/checkpoint')
 parser.add_argument('--device', type=str, default='cuda')
 parser.add_argument('--work_dir', type=str, default='work_dir')
 
@@ -121,21 +122,7 @@ def get_dataloaders(args):
 def get_valdataloaders(args):
     
     val_dataset = Dataset_Union_ALL(
-        paths=[
-                '/mnt/dataset/val_data/verse20',
-                '/mnt/dataset/val_data/verse19',
-                '/mnt/dataset/val_data/MSD_T10',
-                '/mnt/dataset/val_data/LIVER',
-                '/mnt/dataset/val_data/KITS19',
-                '/mnt/dataset/val_data/COVID',
-                '/mnt/dataset/val_data/NH',
-                '/mnt/dataset/val_data/CLINIC_METAL',
-                '/mnt/dataset/val_data/CLINIC',
-                '/mnt/dataset/val_data/SPIDER',
-                '/mnt/dataset/val_data/pelvic',
-                '/mnt/dataset/val_data/VERSE',
-                '/mnt/dataset/val_data/COLON'
-                ],
+        paths=args.test_data_path,
         transform=tio.Compose([
             tio.ToCanonical(),
             tio.RandomFlip(axes=(0, 1, 2)),
@@ -311,27 +298,17 @@ class BaseTrainer:
         prev_masks = torch.zeros_like(gt3D).to(gt3D.device)
         low_res_masks = F.interpolate(prev_masks.float(), size=(args.img_size//4,args.img_size//4,args.img_size//4))
 
-        # random_insert = np.random.randint(2, 9)
-        # for num_click in range(num_clicks):
-        #     points_input, labels_input = self.get_points(prev_masks, gt3D)
+        random_insert = np.random.randint(2, 9)
+        for num_click in range(num_clicks):
+            points_input, labels_input = self.get_points(prev_masks, gt3D)
 
-        #     if num_click == random_insert or num_click == num_clicks - 1:
-        #         low_res_masks, prev_masks = self.batch_forward(sam_model, image_embedding, gt3D, low_res_masks, points=None)
-        #     else:
-        #         low_res_masks, prev_masks = self.batch_forward(sam_model, image_embedding, gt3D, low_res_masks, points=[points_input, labels_input])
-        #     loss = self.seg_loss(prev_masks, gt3D)
-        #     return_loss += loss
-        if num_clicks > 0:
-            for num_click in range(num_clicks):
-                points_input, labels_input = self.get_points(prev_masks, gt3D)
+            if num_click == random_insert or num_click == num_clicks - 1:
+                low_res_masks, prev_masks = self.batch_forward(sam_model, image_embedding, gt3D, low_res_masks, points=None)
+            else:
                 low_res_masks, prev_masks = self.batch_forward(sam_model, image_embedding, gt3D, low_res_masks, points=[points_input, labels_input])
-                loss = self.seg_loss(prev_masks, gt3D)
-                return_loss += loss
-        else:
-            # 当 num_clicks 为 0 时，不使用点提示
-            low_res_masks, prev_masks = self.batch_forward(sam_model, image_embedding, gt3D, low_res_masks, points=None)
             loss = self.seg_loss(prev_masks, gt3D)
             return_loss += loss
+
         return prev_masks, return_loss
     
 
@@ -396,7 +373,7 @@ class BaseTrainer:
 
                     pred_list = []
 
-                    prev_masks, loss = self.interaction(sam_model, image_embedding, gt3D, num_clicks=0)                
+                    prev_masks, loss = self.interaction(sam_model, image_embedding, gt3D, num_clicks=10)                
 
                 epoch_loss += loss.item()
 
@@ -470,7 +447,7 @@ class BaseTrainer:
                     self.click_points = []
                     self.click_labels = []
 
-                    prev_masks, loss = self.interaction(sam_model, image_embedding, gt3D, num_clicks=0)
+                    prev_masks, loss = self.interaction(sam_model, image_embedding, gt3D, num_clicks=10)
 
                 epoch_loss += loss.item()
 
@@ -502,7 +479,7 @@ class BaseTrainer:
                 dist.barrier()
                 self.dataloaders.sampler.set_epoch(epoch)
                 
-            num_clicks = 0
+            num_clicks = 10
             epoch_loss, epoch_iou, epoch_dice, pred_list = self.train_epoch(epoch, num_clicks)
             val_loss, val_dice = self.validate_epoch(epoch, num_clicks)
 

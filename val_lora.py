@@ -51,13 +51,12 @@ from utils.data_paths import img_datas
 from torch.utils.data.dataloader import default_collate
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-tdp', '--test_data_path', type=str, default='/mnt/dataset/trainingdata')
-parser.add_argument('-vp', '--vis_path', type=str, default='visual/sam_med3d_lora20')
-parser.add_argument('-cp', '--checkpoint_path', type=str, default='/mnt/risk2/SAM-Med3D/work_dir/union_train_turbo_loramask_rank4_continue6/sam_model_dice_best.pth')
-parser.add_argument('--save_name', type=str, default='uniondice/sam_med3d_lora20.py')
+parser.add_argument('-tdp', '--test_data_path', type=str, default=['/mnt/dataset/trainingdata'])
+parser.add_argument('-vp', '--vis_path', type=str, default='visual/')
+parser.add_argument('-cp', '--checkpoint_path', type=str, default='/path/to/checkpoint')
+parser.add_argument('--save_name', type=str, default='uniondice/')
 
-# 在parser.add_argument()部分添加
-parser.add_argument('--lora_ckpt', type=str, default='/mnt/risk2/SAM-Med3D/work_dir/union_train_turbo_loramask_rank4_continue6/lora_params_dice_best.pth', help='path to LoRA checkpoint')
+parser.add_argument('--lora_ckpt', type=str, default='/path/to/lora_checkpoint', help='path to LoRA checkpoint')
 parser.add_argument('--lora_rank', type=int, default=4, help='rank of LoRA')
 parser.add_argument('--skip_existing_pred', action='store_true', default=False)
 
@@ -101,16 +100,6 @@ def compute_iou(pred_mask, gt_semantic_seg):
     iou = np.sum(in_mask) / np.sum(out_mask)
     return iou
 
-# def compute_dice(mask_gt, mask_pred):
-#     """Compute soerensen-dice coefficient.
-#     Returns:
-#     the dice coeffcient as float. If both masks are empty, the result is NaN
-#     """
-#     volume_sum = mask_gt.sum() + mask_pred.sum()
-#     if volume_sum == 0:
-#         return np.NaN
-#     volume_intersect = (mask_gt & mask_pred).sum()
-#     return 2*volume_intersect / volume_sum
 
 from safetensors import safe_open
 from safetensors.torch import save_file
@@ -490,23 +479,7 @@ def save_nifti(tensor, filename):
     print(f"Saved NIfTI file: {filename}")
 
 if __name__ == "__main__":    
-    all_dataset_paths = glob(join(args.test_data_path, "*", "*"))
-    all_dataset_paths = list(filter(os.path.isdir, all_dataset_paths))
-    all_dataset_paths = [
-'/mnt/dataset/test_data/verse20',
-'/mnt/dataset/test_data/verse19',
-'/mnt/dataset/test_data/MSD_T10',
-'/mnt/dataset/test_data/LIVER',
-'/mnt/dataset/test_data/KITS19',
-'/mnt/dataset/test_data/COVID',
-'/mnt/dataset/test_data/NH',
-'/mnt/dataset/test_data/CLINIC_METAL',
-'/mnt/dataset/test_data/CLINIC',
-'/mnt/dataset/test_data/SPIDER',
-'/mnt/dataset/test_data/pelvic',
-'/mnt/dataset/test_data/VERSE',
-'/mnt/dataset/test_data/COLON'
-]
+    all_dataset_paths = args.test_data_path
     print(all_dataset_paths)
     print("get", len(all_dataset_paths), "datasets")
 

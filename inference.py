@@ -23,8 +23,8 @@ from utils.data_loader import Dataset_Union_ALL_Val
 from itertools import product
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-tdp', '--test_data_path', type=str, default='./data/validation')
-parser.add_argument('-cp', '--checkpoint_path', type=str, default='ckpt/SAM-Med-weight/sam_med3d_turbo.pth')
+parser.add_argument('-tdp', '--test_data_path', nargs='+', default=['/mnt/dataset/trainingdata'])
+parser.add_argument('-cp', '--checkpoint_path', type=str, default='/path/to/checkpoint')
 parser.add_argument('--output_dir', type=str, default='./visualization')
 parser.add_argument('--task_name', type=str, default='test_amos')
 parser.add_argument('--skip_existing_pred', action='store_true', default=False)
@@ -381,8 +381,10 @@ def save_numpy_to_nifti(in_arr: np.array, out_path, meta_info):
 
 
 if __name__ == "__main__":    
-    all_dataset_paths = glob(join(args.test_data_path, "*", "*"))
-    all_dataset_paths = list(filter(osp.isdir, all_dataset_paths))
+
+    
+    all_dataset_paths = args.test_data_path  # path to your dataset
+    
     print("get", len(all_dataset_paths), "datasets")
 
     crop_transform = tio.CropOrPad(

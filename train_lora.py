@@ -29,19 +29,20 @@ from torch.utils.data.dataloader import default_collate
 
 # %% set up parser
 parser = argparse.ArgumentParser()
-parser.add_argument('--task_name', type=str, default='test_test')
+parser.add_argument('-tdp', '--test_data_path', nargs='+', default=['/mnt/dataset/trainingdata'])
+parser.add_argument('--task_name', type=str, default=None)
 parser.add_argument('--click_type', type=str, default='random')
 parser.add_argument('--multi_click', action='store_true', default=False)
 parser.add_argument('--model_type', type=str, default='vit_b_ori')
-parser.add_argument('--checkpoint', type=str, default='/mnt/risk2/SAM-Med3D/work_dir/union_train_turbo_best_continue4/sam_model_dice_best.pth')
-parser.add_argument('--lora_ckpt', type=str, default='/mnt/risk2/SAM-Med3D/work_dir/union_train_turbo_lora_rank4_continue/lora_params_dice_best.pth', help='path to LoRA checkpoint')
-parser.add_argument('--freeze_sam', action='store_false', default=True, help='whether to freeze SAM3D weights')
-
+parser.add_argument('--checkpoint', type=str, default='/mnt/risk2/BoSAM/weights/BoSAM.pth')
+parser.add_argument('--lora_ckpt', type=str, default='/mnt/risk2/BoSAM/weights/lora_params.pth', help='path to LoRA checkpoint')
+    
 parser.add_argument('--device', type=str, default='cuda')
 parser.add_argument('--work_dir', type=str, default='work_dir')
+
 # train
 parser.add_argument('--num_workers', type=int, default=24)
-parser.add_argument('--gpu_ids', type=int, nargs='+', default=[0,1,2,3,4])     
+parser.add_argument('--gpu_ids', type=int, nargs='+', default=[0,1,2,3,4])
 parser.add_argument('--multi_gpu', action='store_true', default=True)
 parser.add_argument('--resume', action='store_true', default=False)
 parser.add_argument('--allow_partial_weight', action='store_true', default=False)
@@ -57,9 +58,9 @@ parser.add_argument('--num_epochs', type=int, default=500)
 parser.add_argument('--img_size', type=int, default=128)
 parser.add_argument('--batch_size', type=int, default=3)
 parser.add_argument('--accumulation_steps', type=int, default=16)
-parser.add_argument('--lr', type=float, default=1e-4)
+parser.add_argument('--lr', type=float, default=5e-4)
 parser.add_argument('--weight_decay', type=float, default=0.1)
-parser.add_argument('--port', type=int, default=12362)
+parser.add_argument('--port', type=int, default=12363)
 
 args = parser.parse_args()
 
@@ -75,7 +76,7 @@ os.makedirs(MODEL_SAVE_PATH, exist_ok=True)
 
 from safetensors import safe_open
 from safetensors.torch import save_file
-
+from torch.nn import Parameter
 
 class _LoRA_qkv(nn.Module):
     def __init__(
@@ -104,26 +105,19 @@ class _LoRA_qkv(nn.Module):
         return qkv
 
 class LoRA_Sam3D(nn.Module):
-    def __init__(self, sam_model: sam3D, r: int, lora_layer=None, freeze_sam=True):
+    def __init__(self, sam_model: sam3D, r: int, lora_layer=None):
         super(LoRA_Sam3D, self).__init__()
         
-        self.image_encoder = sam_model.image_encoder
-        self.prompt_encoder = sam_model.prompt_encoder
-        self.mask_decoder = sam_model.mask_decoder
         assert r > 0
         if lora_layer:
             self.lora_layer = lora_layer
         else:
             self.lora_layer = list(range(len(sam_model.image_encoder.blocks)))
 
-        self.w_As = []
-        self.w_Bs = []
+        self.w_As = nn.ModuleList()
+        self.w_Bs = nn.ModuleList()
 
-        if freeze_sam:
-            for param in sam_model.parameters():
-                param.requires_grad = False
-
-        for param in sam_model.image_encoder.parameters():
+        for param in sam_model.parameters():
             param.requires_grad = False
 
         for t_layer_i, blk in enumerate(sam_model.image_encoder.blocks):
@@ -135,10 +129,8 @@ class LoRA_Sam3D(nn.Module):
             w_b_linear_q = nn.Linear(r, self.dim, bias=False)
             w_a_linear_v = nn.Linear(self.dim, r, bias=False)
             w_b_linear_v = nn.Linear(r, self.dim, bias=False)
-            self.w_As.append(w_a_linear_q)
-            self.w_Bs.append(w_b_linear_q)
-            self.w_As.append(w_a_linear_v)
-            self.w_Bs.append(w_b_linear_v)
+            self.w_As.extend([w_a_linear_q, w_a_linear_v])
+            self.w_Bs.extend([w_b_linear_q, w_b_linear_v])
             blk.attn.qkv = _LoRA_qkv(
                 w_qkv_linear,
                 w_a_linear_q,
@@ -146,43 +138,133 @@ class LoRA_Sam3D(nn.Module):
                 w_a_linear_v,
                 w_b_linear_v,
             )
-            
+
+        # Add LoRA to mask decoder
+        self.mask_decoder_w_As = nn.ModuleList()
+        self.mask_decoder_w_Bs = nn.ModuleList()
+        
+        for module in sam_model.mask_decoder.modules():
+            if isinstance(module, nn.Linear):
+                w_a = nn.Linear(module.in_features, r, bias=False)
+                w_b = nn.Linear(r, module.out_features, bias=False)
+                self.mask_decoder_w_As.append(w_a)
+                self.mask_decoder_w_Bs.append(w_b)
+                
+                # Wrap the original linear layer
+                new_module = _LoRA_qkv(module, w_a, w_b, w_a, w_b)
+                
+                # Replace the original module with the wrapped one
+                for name, child in sam_model.mask_decoder.named_children():
+                    if child is module:
+                        setattr(sam_model.mask_decoder, name, new_module)
+                        break
+
         self.reset_parameters()
         self.sam = sam_model
+
+    @property
+    def image_encoder(self):
+        return self.sam.image_encoder
+
+    @property
+    def prompt_encoder(self):
+        return self.sam.prompt_encoder
+
+    @property
+    def mask_decoder(self):
+        return self.sam.mask_decoder
+
+    def forward(self, *args, **kwargs):
+        return self.sam(*args, **kwargs)
+
+    def reset_parameters(self) -> None:
+        for w_A in self.w_As + self.mask_decoder_w_As:
+            nn.init.trunc_normal_(w_A.weight, std=0.02)
+        for w_B in self.w_Bs + self.mask_decoder_w_Bs:
+            nn.init.trunc_normal_(w_B.weight, std=0.02)
 
     def save_lora_parameters(self, filename: str) -> None:
         assert filename.endswith(".safetensors")
 
-        num_layer = len(self.w_As)
-        a_tensors = {f"w_a_{i:03d}": self.w_As[i].weight for i in range(num_layer)}
-        b_tensors = {f"w_b_{i:03d}": self.w_Bs[i].weight for i in range(num_layer)}
+        num_image_encoder_layer = len(self.w_As)
+        num_mask_decoder_layer = len(self.mask_decoder_w_As)
+
+        a_tensors = {f"image_encoder_w_a_{i:03d}": self.w_As[i].weight for i in range(num_image_encoder_layer)}
+        b_tensors = {f"image_encoder_w_b_{i:03d}": self.w_Bs[i].weight for i in range(num_image_encoder_layer)}
+        
+        a_tensors.update({f"mask_decoder_w_a_{i:03d}": self.mask_decoder_w_As[i].weight for i in range(num_mask_decoder_layer)})
+        b_tensors.update({f"mask_decoder_w_b_{i:03d}": self.mask_decoder_w_Bs[i].weight for i in range(num_mask_decoder_layer)})
 
         merged_dict = {**a_tensors, **b_tensors}
         save_file(merged_dict, filename)
 
     def load_lora_parameters(self, filename: str) -> None:
-        assert filename.endswith(".safetensors")
+        if not os.path.exists(filename):
+            print(f"No LoRA checkpoint found at {filename}, initializing parameters")
+            self.reset_parameters()
+            return
 
+        if filename.endswith(".safetensors"):
+            self.load_from_safetensors(filename)
+        elif filename.endswith(".pth"):
+            self.load_from_pth(filename)
+        else:
+            raise ValueError(f"Unsupported file format: {filename}. Use .safetensors or .pth")
+
+    def load_from_safetensors(self, filename: str) -> None:
         with safe_open(filename, framework="pt") as f:
             for i, w_A_linear in enumerate(self.w_As):
-                saved_key = f"w_a_{i:03d}"
-                saved_tensor = f.get_tensor(saved_key)
-                w_A_linear.weight = Parameter(saved_tensor)
+                saved_key = f"image_encoder_w_a_{i:03d}"
+                if saved_key in f.keys():
+                    saved_tensor = f.get_tensor(saved_key)
+                    w_A_linear.weight.data.copy_(saved_tensor)
 
             for i, w_B_linear in enumerate(self.w_Bs):
-                saved_key = f"w_b_{i:03d}"
-                saved_tensor = f.get_tensor(saved_key)
-                w_B_linear.weight = Parameter(saved_tensor)
+                saved_key = f"image_encoder_w_b_{i:03d}"
+                if saved_key in f.keys():
+                    saved_tensor = f.get_tensor(saved_key)
+                    w_B_linear.weight.data.copy_(saved_tensor)
 
-    def reset_parameters(self) -> None:
-        for w_A in self.w_As:
-            nn.init.kaiming_uniform_(w_A.weight, a=math.sqrt(5))
-        for w_B in self.w_Bs:
-            nn.init.zeros_(w_B.weight)
+            for i, w_A_linear in enumerate(self.mask_decoder_w_As):
+                saved_key = f"mask_decoder_w_a_{i:03d}"
+                if saved_key in f.keys():
+                    saved_tensor = f.get_tensor(saved_key)
+                    w_A_linear.weight.data.copy_(saved_tensor)
+
+            for i, w_B_linear in enumerate(self.mask_decoder_w_Bs):
+                saved_key = f"mask_decoder_w_b_{i:03d}"
+                if saved_key in f.keys():
+                    saved_tensor = f.get_tensor(saved_key)
+                    w_B_linear.weight.data.copy_(saved_tensor)
+
+    def load_from_pth(self, filename: str) -> None:
+        state_dict = torch.load(filename, map_location='cpu')
+        
+        for i, w_A_linear in enumerate(self.w_As):
+            saved_key = f"w_As.{i}.weight"
+            if saved_key in state_dict:
+                w_A_linear.weight.data.copy_(state_dict[saved_key])
+
+        for i, w_B_linear in enumerate(self.w_Bs):
+            saved_key = f"w_Bs.{i}.weight"
+            if saved_key in state_dict:
+                w_B_linear.weight.data.copy_(state_dict[saved_key])
+
+        for i, w_A_linear in enumerate(self.mask_decoder_w_As):
+            saved_key = f"mask_decoder_w_As.{i}.weight"
+            if saved_key in state_dict:
+                w_A_linear.weight.data.copy_(state_dict[saved_key])
+
+        for i, w_B_linear in enumerate(self.mask_decoder_w_Bs):
+            saved_key = f"mask_decoder_w_Bs.{i}.weight"
+            if saved_key in state_dict:
+                w_B_linear.weight.data.copy_(state_dict[saved_key])
+
+        print(f"Loaded LoRA parameters from {filename}")
 
 def build_model(args):
     sam_model = sam_model_registry3D[args.model_type](checkpoint=None).to(device)
-    sam_model = LoRA_Sam3D(sam_model, 4, freeze_sam=args.freeze_sam).to(device)
+    sam_model = LoRA_Sam3D(sam_model, 4).to(device)
 
     if args.multi_gpu:
         sam_model = DDP(sam_model, device_ids=[args.rank], output_device=args.rank)
@@ -234,21 +316,7 @@ def get_dataloaders(args):
 def get_valdataloaders(args):
     
     val_dataset = Dataset_Union_ALL(
-        paths=[
-                '/mnt/dataset/val_data/verse20',
-                '/mnt/dataset/val_data/verse19',
-                '/mnt/dataset/val_data/MSD_T10',
-                '/mnt/dataset/val_data/LIVER',
-                '/mnt/dataset/val_data/KITS19',
-                '/mnt/dataset/val_data/COVID',
-                '/mnt/dataset/val_data/NH',
-                '/mnt/dataset/val_data/CLINIC_METAL',
-                '/mnt/dataset/val_data/CLINIC',
-                '/mnt/dataset/val_data/SPIDER',
-                '/mnt/dataset/val_data/pelvic',
-                '/mnt/dataset/val_data/VERSE',
-                '/mnt/dataset/val_data/COLON'
-                ],
+        paths=args.test_data_path,  # path to the validation data
         transform=tio.Compose([
             tio.ToCanonical(),
             tio.RandomFlip(axes=(0, 1, 2)),
@@ -330,10 +398,10 @@ class BaseTrainer:
             sam_model = self.model
 
         # 设置LoRA部分的参数
-        lora_params = [
-            {'params': iter_params(sam_model.w_As), 'lr': self.args.lr},
-            {'params': iter_params(sam_model.w_Bs), 'lr': self.args.lr},
-        ]
+        lora_params = []
+        
+        for module in sam_model.w_As + sam_model.w_Bs + sam_model.mask_decoder_w_As + sam_model.mask_decoder_w_Bs:
+            lora_params.append({'params': module.parameters(), 'lr': self.args.lr})
 
         self.optimizer = torch.optim.AdamW(lora_params, lr=self.args.lr, betas=(0.9, 0.999), weight_decay=self.args.weight_decay)
 
@@ -349,7 +417,8 @@ class BaseTrainer:
 
         if last_ckpt:
             if self.args.multi_gpu:
-                self.model.module.sam.load_state_dict(last_ckpt['model_state_dict'], strict=False)
+                state_dict = {k.replace('sam.', ''): v for k, v in last_ckpt['model_state_dict'].items()}
+                self.model.module.sam.load_state_dict(state_dict, strict=False)
             else:
                 self.model.sam.load_state_dict(last_ckpt['model_state_dict'], strict=False)
 
@@ -367,21 +436,12 @@ class BaseTrainer:
             # 加载LoRA权重
             if self.args.lora_ckpt is not None:
                 lora_ckp_path = self.args.lora_ckpt
-            else:
-                lora_ckp_path = ckp_path.replace('sam_model', 'lora_params')
             
             if os.path.exists(lora_ckp_path):
-                lora_ckpt = torch.load(lora_ckp_path, map_location=self.args.device)
                 if self.args.multi_gpu:
-                    for w_A, w_A_state_dict in zip(self.model.module.w_As, lora_ckpt['w_As']):
-                        w_A.load_state_dict(w_A_state_dict)
-                    for w_B, w_B_state_dict in zip(self.model.module.w_Bs, lora_ckpt['w_Bs']):
-                        w_B.load_state_dict(w_B_state_dict)
+                    self.model.module.load_lora_parameters(lora_ckp_path)
                 else:
-                    for w_A, w_A_state_dict in zip(self.model.w_As, lora_ckpt['w_As']):
-                        w_A.load_state_dict(w_A_state_dict)
-                    for w_B, w_B_state_dict in zip(self.model.w_Bs, lora_ckpt['w_Bs']):
-                        w_B.load_state_dict(w_B_state_dict)
+                    self.model.load_lora_parameters(lora_ckp_path)
                 print(f"Loaded LoRA checkpoint from {lora_ckp_path}")
             else:
                 print(f"No LoRA checkpoint found at {lora_ckp_path}, using random initialization for LoRA weights")
@@ -392,7 +452,7 @@ class BaseTrainer:
             print(f"No checkpoint found at {ckp_path}, start training from scratch")
 
     def save_checkpoint(self, epoch, state_dict, describe="last"):
-    # 保存完整模型的checkpoint
+
         torch.save({
             "epoch": epoch + 1,
             "model_state_dict": state_dict,
@@ -408,12 +468,11 @@ class BaseTrainer:
         }, join(MODEL_SAVE_PATH, f"sam_model_{describe}.pth"))
 
         # 保存LoRA参数
-        lora_state_dict = {
-            'w_As': [w_A.state_dict() for w_A in self.model.module.w_As],
-            'w_Bs': [w_B.state_dict() for w_B in self.model.module.w_Bs]
-        }
-        torch.save(lora_state_dict, join(MODEL_SAVE_PATH, f"lora_params_{describe}.pth"))
-    
+        if self.args.multi_gpu:
+            self.model.module.save_lora_parameters(join(MODEL_SAVE_PATH, f"lora_params_{describe}.safetensors"))
+        else:
+            self.model.save_lora_parameters(join(MODEL_SAVE_PATH, f"lora_params_{describe}.safetensors"))
+
     def batch_forward(self, sam_model, image_embedding, gt3D, low_res_masks, points=None):
         
         sparse_embeddings, dense_embeddings = sam_model.prompt_encoder(

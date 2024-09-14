@@ -21,10 +21,10 @@ from utils.click_method import get_next_click3D_torch_ritm, get_next_click3D_tor
 from utils.data_loader import Dataset_Union_ALL_Val
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-tdp', '--test_data_path', type=str, default='/mnt/dataset/trainingdata')
-parser.add_argument('-vp', '--vis_path', type=str, default='visual/sam_cross_body')
-parser.add_argument('-cp', '--checkpoint_path', type=str, default='/mnt/risk2/SAM-Med3D/work_dir/cross_train/sam_model_val_dice_best.pth')
-parser.add_argument('--save_name', type=str, default='uniondice/sam_cross_body.py')
+parser.add_argument('-tdp', '--test_data_path', nargs='+', default=['/mnt/dataset/trainingdata'])
+parser.add_argument('-vp', '--vis_path', type=str, default='visual/')
+parser.add_argument('-cp', '--checkpoint_path', type=str, default='/path/to/checkpoint')
+parser.add_argument('--save_name', type=str, default='uniondice/')
 parser.add_argument('--skip_existing_pred', action='store_true', default=False)
 
 parser.add_argument('--image_size', type=int, default=256)
@@ -316,23 +316,9 @@ def save_nifti(tensor, filename):
     print(f"Saved NIfTI file: {filename}")
 
 if __name__ == "__main__":    
-    all_dataset_paths = glob(join(args.test_data_path, "*", "*"))
-    all_dataset_paths = list(filter(os.path.isdir, all_dataset_paths))
-    all_dataset_paths = [
-# '/mnt/dataset/test_data/verse20',
-# '/mnt/dataset/test_data/verse19',
-# '/mnt/dataset/test_data/MSD_T10',
-# '/mnt/dataset/test_data/LIVER',
-# '/mnt/dataset/test_data/KITS19',
-# '/mnt/dataset/test_data/COVID',
-# '/mnt/dataset/test_data/NH',
-# '/mnt/dataset/test_data/CLINIC_METAL',
-# '/mnt/dataset/test_data/CLINIC',
-# '/mnt/dataset/test_data/SPIDER',
-'/mnt/dataset/test_data/pelvic',
-# '/mnt/dataset/test_data/VERSE',
-# '/mnt/dataset/test_data/COLON'
-]
+
+    all_dataset_paths = args.test_data_path  # path to your dataset
+
     print(all_dataset_paths)
     print("get", len(all_dataset_paths), "datasets")
 
