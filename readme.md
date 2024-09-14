@@ -1,9 +1,9 @@
-# SAM-Med3D \[[Paper](https://arxiv.org/abs/2310.15161)]
+# BoSAM \[[Paper]]
 
-<a src="https://img.shields.io/badge/cs.CV-2310.15161-b31b1b?logo=arxiv&logoColor=red" href="https://arxiv.org/abs/2310.15161"> 
+<!-- <a src="https://img.shields.io/badge/cs.CV-2310.15161-b31b1b?logo=arxiv&logoColor=red" href="https://arxiv.org/abs/2310.15161"> 
 <img src="https://img.shields.io/badge/cs.CV-2310.15161-b31b1b?logo=arxiv&logoColor=red">
 <a src="https://img.shields.io/badge/WeChat-Group-green?logo=wechat" href="https://github.com/uni-medical/SAM-Med3D/tree/main?tab=readme-ov-file#-discussion-group"> <img src="https://img.shields.io/badge/WeChat-Group-green?logo=wechat">
-</a>
+</a> -->
 
 
 <div align="center">

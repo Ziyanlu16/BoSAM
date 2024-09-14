@@ -1,17 +1,5 @@
 img_datas = [
-'/mnt/dataset/trainingdata/verse20',
-'/mnt/dataset/trainingdata/verse19',
-'/mnt/dataset/trainingdata/MSD_T10',
-'/mnt/dataset/trainingdata/LIVER',
-'/mnt/dataset/trainingdata/KITS19',
-'/mnt/dataset/trainingdata/COVID',
-'/mnt/dataset/trainingdata/NH',
-'/mnt/dataset/trainingdata/CLINIC_METAL',
-'/mnt/dataset/trainingdata/CLINIC',
-'/mnt/dataset/trainingdata/SPIDER'
-'/mnt/dataset/trainingdata/pelvic',
-'/mnt/dataset/trainingdata/VERSE',
-'/mnt/dataset/trainingdata/COLON'
+
 ]
 
 all_classes = [
