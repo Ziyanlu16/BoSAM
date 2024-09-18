@@ -5,9 +5,7 @@
   <img src="assets/benchmark_img.jpg">
 </div>
 
-[Overview](#overview) • [Useage](#Usage) • [Results](#results) • [Documentation](#documentation) • [Contribute](#contribute)
-
-![BoSAM Visualization](assets/visualization.png)
+[Overview](#-overview) • [Usage](#-usage) • [Results](#-results) • [Benchmark](#open_hands-benchmark) • [Method](#-method)
 
 
 ## 🌟 Overview
