@@ -34,8 +34,8 @@ parser.add_argument('--task_name', type=str, default=None)
 parser.add_argument('--click_type', type=str, default='random')
 parser.add_argument('--multi_click', action='store_true', default=False)
 parser.add_argument('--model_type', type=str, default='vit_b_ori')
-parser.add_argument('--checkpoint', type=str, default='/mnt/risk2/BoSAM/weights/BoSAM.pth')
-parser.add_argument('--lora_ckpt', type=str, default='/mnt/risk2/BoSAM/weights/lora_params.pth', help='path to LoRA checkpoint')
+parser.add_argument('--checkpoint', type=str, default='/path/to/checkpoint')
+parser.add_argument('--lora_ckpt', type=str, default='', help='path to LoRA checkpoint')
     
 parser.add_argument('--device', type=str, default='cuda')
 parser.add_argument('--work_dir', type=str, default='work_dir')
@@ -51,8 +51,8 @@ parser.add_argument('--allow_partial_weight', action='store_true', default=False
 parser.add_argument('--lr_scheduler', type=str, default='coswarm')
 parser.add_argument('--pcc', action='store_true', default=False)
 
-# parser.add_argument('--step_size', type=list, default=[30, 50, 70])
-# parser.add_argument('--gamma', type=float, default=0.5)
+parser.add_argument('--step_size', type=list, default=[30, 50, 70])
+parser.add_argument('--gamma', type=float, default=0.5)
 
 parser.add_argument('--num_epochs', type=int, default=500)
 parser.add_argument('--img_size', type=int, default=128)
