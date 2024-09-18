@@ -1,6 +1,4 @@
-img_datas = [
-
-]
+img_datas = []
 
 all_classes = [
 'COVID_lesion',
