@@ -2,12 +2,10 @@
 
 
 <div align="center">
-  <img src="assets/benchmark_img.png">
+  <img src="assets/benchmark_img.jog">
 </div>
 
-<div align="center">
-  <img src="assets/model_structure.png">
-</div>
+
 
 
 ## 🌟 Highlights
@@ -116,10 +114,7 @@ Other checkpoints are available with their official link: [SAM](https://drive.go
 
 ## 🗼 Method
 <div align="center">
-  <img src="assets/comparison.png">
-</div>
-<div align="center">
-  <img src="assets/architecture.png">
+  <img src="assets/model_structure.jpg">
 </div>
 
 ## 🏆 Results
