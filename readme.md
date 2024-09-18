@@ -2,9 +2,8 @@
 
 
 <div align="center">
-  <img src="assets/benchmark_img.jog">
+  <img src="assets/benchmark_img.jpg">
 </div>
-
 
 
 
@@ -98,8 +97,9 @@ python validation.py --seed 2023\
 - save_name: filename to save evaluation results 
 
 
-## Dataset
+## :open_hands: Benchmark
 
+We've open-sourced the SegBone Benchmark, available at [SegBone](www.github.com). It includes three datasets with different test set partitions. For detailed information on the benchmark and datasets, please refer to our [paper](www.github.com). We hope this resource will accelerate research in bone segmentation.
 
 ## 🔗 Checkpoint
 
