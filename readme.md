@@ -5,7 +5,7 @@
   <img src="assets/benchmark_img.jpg">
 </div>
 
-[Overview](#-overview) • [Usage](#-usage) • [Results](#-results) • [Benchmark](#open_hands-benchmark) • [Method](#-method)
+[Overview](#-overview) • [Usage](#-usage) • [Results](#-results) • [Benchmark](#open_hands-benchmark) • [Method](#-method) • [Checkpoint](#-checkpoint) • [Visualization](#-visualization)
 
 
 ## 🌟 Overview
