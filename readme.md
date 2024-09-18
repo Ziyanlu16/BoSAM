@@ -57,7 +57,7 @@ img_datas = [
 
 
 #### 2. **Run the Training Script**: 
-Run `bash train.sh` (run `bash train_lora.sh if you want to Lora fine-tune`) to execute the following command in your terminal:
+Run `scripts\bash train.sh` (run `scripts\bash train_lora.sh if you want to Lora fine-tune`) to execute the following command in your terminal:
 
 ```
 python train.py --multi_gpu --task_name ${tag}
@@ -80,8 +80,8 @@ The key options are listed below:
 
 ### Evaluation & Inference
 Prepare your own dataset according to your specific scenario. Dataset structure remain same as trainging data.
-Then you can simply run `bash val.sh` to **quickly validate** BoSAM on your data.
-Or you can use `bash val_lora.sh` to validate Lora BoSAM on your data
+Then you can simply run `scripts\bash val.sh` to **quickly validate** BoSAM on your data.
+Or you can use `scripts\bash val_lora.sh` to validate Lora BoSAM on your data
 
 ```
 python validation.py --seed 2023\
