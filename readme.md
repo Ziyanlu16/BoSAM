@@ -5,10 +5,16 @@
   <img src="assets/benchmark_img.jpg">
 </div>
 
-[Overview](#-overview) • [Usage](#-usage) • [Results](#-results) • [Benchmark](#open_hands-benchmark) • [Method](#-method) • [Checkpoint](#-checkpoint) • [Visualization](#-visualization)
+<div align="center">
+
+| [📚 Overview](#-overview) | [🛠️ Usage](#-usage) | [🏆 Results](#-results) | [🔬 Benchmark](#open_hands-benchmark) |
+|:------------------------:|:-------------------:|:-----------------------:|:-------------------------------------:|
+| [🧠 Method](#-method) | [💾 Checkpoint](#-checkpoint) | [👁️ Visualization](#-visualization) |
+
+</div>
 
 
-## 🌟 Overview
+## 👀 Overview
 
 - 📚 Collected and open-sourced the largest 3D skeletal segmentation dataset to date.
 - 🚀 Surpassed current SOTA 3D segmentation models, achieving efficient promptable segmentation satisfactory 3D results.
