@@ -5,9 +5,12 @@
   <img src="assets/benchmark_img.jpg">
 </div>
 
+[Overview](#overview) • [Useage](#Usage) • [Results](#results) • [Documentation](#documentation) • [Contribute](#contribute)
+
+![BoSAM Visualization](assets/visualization.png)
 
 
-## 🌟 Highlights
+## 🌟 Overview
 
 - 📚 Collected and open-sourced the largest 3D skeletal segmentation dataset to date.
 - 🚀 Surpassed current SOTA 3D segmentation models, achieving efficient promptable segmentation satisfactory 3D results.
