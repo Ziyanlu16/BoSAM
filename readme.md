@@ -1,10 +1,12 @@
 # BoSAM \[[Paper]]
 
 
-
+<div align="center">
+  <img src="assets/benchmark_img.png">
+</div>
 
 <div align="center">
-  <img src="assets/motivation.png">
+  <img src="assets/model_structure.png">
 </div>
 
 
