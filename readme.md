@@ -1,5 +1,7 @@
 # BoSAM \[[Paper]]
 
+The official repo of "BoSAM".
+
 
 <div align="center">
 
@@ -45,6 +47,18 @@
 
 
 ## 🔨 Usage
+
+### Quick Start for SAM-Med3D inference
+
+First, set up your environment with the following commands:
+```
+conda create --name sammed3d python=3.10 
+conda activate sammed3d
+pip install light-the-torch && ltt install torch
+pip install torchio opencv-python-headless matplotlib prefetch_generator monai edt medim
+```
+
+
 ### Training / Fine-tuning
 (we recommend fine-tuning with SAM-Med3D pre-trained weights from [link](https://github.com))
 
