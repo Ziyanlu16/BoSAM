@@ -48,7 +48,7 @@ The official repo of "BoSAM".
 
 ## 🔨 Usage
 
-### Quick Start for SAM-Med3D inference
+### Environment set up
 
 First, set up your environment with the following commands:
 ```
@@ -158,11 +158,9 @@ We've open-sourced the SegBone Benchmark, available at [SegBone](www.github.com)
 Other checkpoints are available with their official link: [SAM](https://drive.google.com/file/d/1_U26MIJhWnWVwmI5JkGg2cd2J6MvkqU-/view?usp=drive_link) and [SAM-Med2D](https://drive.google.com/file/d/1ARiB5RkSsWmAB_8mqWnwDF8ZKTtFwsjl/view?usp=drive_link). -->
 
 ## 🗼 Method
-<div align="center" style="width: 50%; margin: auto;">
-  <img src="assets/model_structure.jpg" style="width: 100%; height: auto;" alt="Model Structure">
-  <br>
-  <em style="color: #666;">BoSAM structure Visualization</em>
-</div>
+<div align="center">  
+ <img src="assets/model_structure.jpg" style="width: 50%; height: auto;" alt="Model Structure"> 
+ </div>
 
 ## 🏆 Results
 ### 💡 Overall Performance
