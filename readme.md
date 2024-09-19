@@ -146,6 +146,8 @@ Other checkpoints are available with their official link: [SAM](https://drive.go
 ## 🗼 Method
 <div align="center">
   <img src="assets/model_structure.jpg" style="width: 50%; height: auto;" alt="Model Structure">
+    <em style="color: #666; font-size: 0.9em;">BoSAM structure Visualization</em>
+
 </div>
 
 ## 🏆 Results
@@ -169,6 +171,7 @@ Other checkpoints are available with their official link: [SAM](https://drive.go
 | **BoSAM**          | 5 points  | 128×128×128  | **82.71** |
 | **BoSAM**          | 10 points | 128×128×128  | **83.01** |
 
+Comparison with SOTA 3D segmentation models
 
 
 ### 💡 Visualization
