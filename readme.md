@@ -3,7 +3,7 @@
 
 <div align="center">
 
-| [📚 Overview](#-overview) | [🛠️ Usage](#-usage) | [🏆 Results](#-results) | [🔬 Benchmark](#open_hands-benchmark) |
+| [📚 Overview](#-highlights) | [🛠️ Usage](#-usage) | [🏆 Results](#-results) | [🔬 Benchmark](#open_hands-benchmark) |
 |:------------------------:|:-------------------:|:-----------------------:|:-------------------------------------:|
 | [🧠 Method](#-method) | [💾 Checkpoint](#-checkpoint) | [👁️ Visualization](#-visualization) |
 
@@ -81,7 +81,7 @@ Important notes:
 Then, modify the `utils/data_paths.py` according to your own data.
 ```
 img_datas = [
-"data/train",
+"data/BoSAM/train",
 ...
 ]
 ```
@@ -91,7 +91,7 @@ img_datas = [
 Run `scripts\bash train.sh` (run `scripts\bash train_lora.sh if you want to Lora fine-tune`) to execute the following command in your terminal:
 
 ```
-python train.py --multi_gpu --task_name ${tag}
+python train.py --multi_gpu --task_name ${tag}`
 ```
 This will start the training process of the BoSAM model on your prepared data. If you use only one GPU, remove the `--multi_gpu` flag.
 
@@ -145,7 +145,7 @@ Other checkpoints are available with their official link: [SAM](https://drive.go
 
 ## 🗼 Method
 <div align="center">
-  <img src="assets/model_structure.jpg">
+  <img src="assets/model_structure.jpg" style="width: 50%; height: auto;" alt="Model Structure">
 </div>
 
 ## 🏆 Results
