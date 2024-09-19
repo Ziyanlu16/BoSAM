@@ -52,8 +52,8 @@ The official repo of "BoSAM".
 
 First, set up your environment with the following commands:
 ```
-conda create --name sammed3d python=3.10 
-conda activate sammed3d
+conda create --name bosam python=3.10 
+conda activate bosam
 pip install light-the-torch && ltt install torch
 pip install torchio opencv-python-headless matplotlib prefetch_generator monai edt medim
 ```
@@ -62,7 +62,7 @@ pip install torchio opencv-python-headless matplotlib prefetch_generator monai e
 ### Training / Fine-tuning
 (we recommend fine-tuning with SAM-Med3D pre-trained weights from [link](https://github.com))
 
-To train the SAM-Med3D model on your own data, follow these steps:
+To train the BoSAM model on your own data, follow these steps:
 
 #### 0. **(Recommend) Prepare the Pre-trained Weights**
 
