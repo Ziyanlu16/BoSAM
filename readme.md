@@ -12,7 +12,7 @@
 <div align="center" style="margin-bottom: 20px;">
   <img src="assets/benchmark_img.jpg" alt="BoSAM Benchmark" width="400" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
   <br>
-  <em style="color: #666; font-size: 0.9em;">Figure 1: SegBone Benchmark Visualization</em>
+  <em style="color: #666; font-size: 0.9em;">SegBone Benchmark Visualization</em>
 </div>
 
 # 💥Highlights
@@ -146,7 +146,7 @@ Other checkpoints are available with their official link: [SAM](https://drive.go
 ## 🗼 Method
 <div align="center">
   <img src="assets/model_structure.jpg" style="width: 50%; height: auto;" alt="Model Structure">
-    <em style="color: #666; font-size: 0.9em;">BoSAM structure Visualization</em>
+    <em style="color: #666">BoSAM structure Visualization</em>
 
 </div>
 
