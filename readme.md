@@ -60,7 +60,7 @@ pip install torchio opencv-python-headless matplotlib prefetch_generator monai e
 
 
 ### Training / Fine-tuning
-(we recommend fine-tuning with SAM-Med3D pre-trained weights from [link](https://github.com))
+(we recommend fine-tuning with BoSAM pre-trained weights from [link](https://github.com))
 
 To train the BoSAM model on your own data, follow these steps:
 
