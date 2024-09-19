@@ -15,14 +15,33 @@
   <em style="color: #666; font-size: 0.9em;">Figure 1: SegBone Benchmark Visualization</em>
 </div>
 
+# Project Highlights
 
+<table>
+  <tr>
+    <td align="center"><h3>📚 Dataset</h3></td>
+    <td align="center"><h3>🚀 Performance</h3></td>
+    <td align="center"><h3>🛠️ Pipeline</h3></td>
+  </tr>
+  <tr>
+    <td>
+      <p>Largest 3D skeletal segmentation dataset open-sourced</p>
+    </td>
+    <td>
+      <p>Surpassed SOTA models with efficient promptable segmentation</p>
+    </td>
+    <td>
+      <p>Complete workflow: dataset → model → visualization</p>
+    </td>
+  </tr>
+</table>
 
+---
 
-## 👀 Overview
-
-- 📚 Collected and open-sourced the largest 3D skeletal segmentation dataset to date.
-- 🚀 Surpassed current SOTA 3D segmentation models, achieving efficient promptable segmentation satisfactory 3D results.
-- 🛠️ Developed a complete 3D skeletal segmentation pipeline from dataset to model to visualization.
+> 💡 **Key Achievements:**
+> 1. Pioneering data collection
+> 2. State-of-the-art results
+> 3. End-to-end solution
 
 ## 🔨 Usage
 ### Training / Fine-tuning
