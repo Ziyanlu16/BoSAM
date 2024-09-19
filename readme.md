@@ -48,7 +48,7 @@ The official repo of "BoSAM".
 
 ## 🔨 Usage
 
-<!-- ### Environment set up
+### Environment set up
 
 First, set up your environment with the following commands:
 ```
@@ -56,20 +56,8 @@ conda create --name sammed3d python=3.10
 conda activate sammed3d
 pip install light-the-torch && ltt install torch
 pip install torchio opencv-python-headless matplotlib prefetch_generator monai edt medim
-``` -->
+```
 
-## 🛠️ Environment Setup
-
-<details>
-<summary>Click to expand setup instructions</summary>
-
-Follow these steps to set up your environment:
-
-1. **Create and activate a new conda environment:**
-
-   ```bash
-   conda create --name sammed3d python=3.10 
-   conda activate sammed3d
 
 ### Training / Fine-tuning
 (we recommend fine-tuning with SAM-Med3D pre-trained weights from [link](https://github.com))
