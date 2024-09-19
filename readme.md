@@ -15,7 +15,7 @@
   <em style="color: #666; font-size: 0.9em;">Figure 1: SegBone Benchmark Visualization</em>
 </div>
 
-# Project Highlights
+# 💥Highlights
 
 <table>
   <tr>
@@ -39,9 +39,10 @@
 ---
 
 > 💡 **Key Achievements:**
-> 1. Pioneering data collection
+> 1. Pioneering dataset release
 > 2. State-of-the-art results
 > 3. End-to-end solution
+
 
 ## 🔨 Usage
 ### Training / Fine-tuning
