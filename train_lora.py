@@ -322,7 +322,7 @@ def get_valdataloaders(args):
             tio.RandomFlip(axes=(0, 1, 2)),
         ]),
         threshold=1000,
-        pcc=True  # 启用 pcc
+        pcc=True  # activate pcc
     )
 
     if args.multi_gpu:
@@ -397,7 +397,7 @@ class BaseTrainer:
         else:
             sam_model = self.model
 
-        # 设置LoRA部分的参数
+        # Lora paprameters setting
         lora_params = []
         
         for module in sam_model.w_As + sam_model.w_Bs + sam_model.mask_decoder_w_As + sam_model.mask_decoder_w_Bs:
@@ -433,7 +433,7 @@ class BaseTrainer:
                 self.best_loss = last_ckpt['best_loss']
                 self.best_dice = last_ckpt['best_dice']
 
-            # 加载LoRA权重
+            # Load the lora weight
             if self.args.lora_ckpt is not None:
                 lora_ckp_path = self.args.lora_ckpt
             
@@ -467,7 +467,7 @@ class BaseTrainer:
             "used_datas": img_datas,
         }, join(MODEL_SAVE_PATH, f"sam_model_{describe}.pth"))
 
-        # 保存LoRA参数
+        # save lora weight
         if self.args.multi_gpu:
             self.model.module.save_lora_parameters(join(MODEL_SAVE_PATH, f"lora_params_{describe}.safetensors"))
         else:

@@ -4,7 +4,6 @@ import numpy as np
 
 module_name_list = [
     "sam_med3d",
-    # "sam_med2d_ft2d"
 ]
 
 for module_idx, module_name in enumerate(module_name_list):

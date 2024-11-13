@@ -86,7 +86,7 @@ def get_dataloaders(args):
                 tio.ToCanonical(),
                 tio.RandomFlip(axes=(0, 1, 2)),
             ]), 
-            pcc=True,  # 启用 pcc
+            pcc=True, 
             threshold=1000
         )
     else:
@@ -98,7 +98,7 @@ def get_dataloaders(args):
                 tio.RandomFlip(axes=(0, 1, 2)),
             ]),
             threshold=1000,
-            pcc=False  # 不启用 pcc
+            pcc=False  
         )
 
     if args.multi_gpu:
@@ -128,7 +128,7 @@ def get_valdataloaders(args):
             tio.RandomFlip(axes=(0, 1, 2)),
         ]),
         threshold=1000,
-        pcc=True  # 启用 pcc
+        pcc=True 
     )
 
     if args.multi_gpu:
