@@ -55,7 +55,7 @@ First, set up your environment with the following commands:
 conda create --name bosam python=3.10 
 conda activate bosam
 pip install light-the-torch && ltt install torch
-pip install torchio opencv-python-headless matplotlib prefetch_generator monai edt medim
+pip install monai torchio edt prefetch_generator gradio PyQt5 vtk
 ```
 
 
