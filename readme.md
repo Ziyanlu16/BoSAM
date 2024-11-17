@@ -167,11 +167,11 @@ Other checkpoints are available with their official link: [SAM](https://drive.go
 
 | Model              | Prompt    | Resolution   | Dice   |
 |--------------------|-----------|--------------|--------|
-| TransUNet          |           | 512×512×N    | 77.33  |
+| TransUNet          |           | 256×256×N    | 77.33  |
 | 3D-TransUNet       |           | 128×128×128  | 79.05  |
-| SegmentAnyBone(2D) |           | 512×512×N    | 70.30  |
+| SegmentAnyBone(2D) |           | 256×256×N    | 70.30  |
 | SegmentAnyBone     |           | 128×128×128  | 71.02  |
-| SAM                | 10 points | 512×512×N    | 16.75  |
+| SAM                | 10 points | 256×256×N    | 16.75  |
 | SAM-Med2D          | 10 points | 256×256×N    | 18.14  |
 | SAM-Med3D          | 1 point   | 128×128×128  | 25.43  |
 | SAM-Med3D          | 5 points  | 128×128×128  | 54.73  |
